@@ -1,0 +1,1 @@
+Please download https://github.com/davisking/dlib-models/blob/master/dlib_face_recognition_resnet_model_v1.dat.bz2 and decompress to obtain the dlib_face_recognition_resnet_model_v1.dat model
