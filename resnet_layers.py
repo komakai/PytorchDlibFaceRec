@@ -77,6 +77,18 @@ class AvgPool(nn.AvgPool2d):
             self.kernel_size = (x.size()[-2], x.size()[-1])
         return super().forward(x)
 
+AFFINE_CONV_MODE = 0
+
+class Affine(nn.Module):
+    def __init__(self, gamma, beta):
+        super().__init__()
+        # shaped (C, 1, 1) to broadcast per-channel over both (C, H, W) and (N, C, H, W) inputs
+        self.register_buffer("gamma", gamma.reshape(-1, 1, 1))
+        self.register_buffer("beta", beta.reshape(-1, 1, 1))
+
+    def forward(self, x):
+        return x * self.gamma + self.beta
+
 FC_HAS_BIAS = 0
 
 class Fc(nn.Linear):

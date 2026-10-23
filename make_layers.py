@@ -56,21 +56,16 @@ def make_affine(deserializer):
     deserializer.read_int()  # version
     (n, affine_channels, nr, nc) = deserializer.read_int4()
     size = n * affine_channels * nr * nc * 4
-    gamma = make_tensor_shaped(deserializer.read_tensor(mark, size), (affine_channels, 1, 1, 1))
+    gamma = make_tensor(deserializer.read_tensor(mark, size))
     mark += size
     deserializer.read_int()  # version
     (n, k, nr, nc) = deserializer.read_int4()
     size = n * k * nr * nc * 4
     beta = make_tensor(deserializer.read_tensor(mark, size))
     mode = deserializer.read_int()
+    assert mode == AFFINE_CONV_MODE, "Only conv mode affine layers are supported"
     deserializer.skip(33)
-    ret = nn.Conv2d(in_channels=affine_channels, out_channels=affine_channels, kernel_size=1, stride=1,
-                            groups=affine_channels, bias=True)
-    with torch.no_grad():
-        ret.weight.copy_(gamma)
-        ret.bias.copy_(beta)
-
-    return ret
+    return Affine(gamma, beta)
 
 def make_relu(deserializer):
     deserializer.skip(33)
